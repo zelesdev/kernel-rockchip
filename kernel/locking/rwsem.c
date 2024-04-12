@@ -1668,7 +1668,9 @@ EXPORT_SYMBOL(up_read);
 void up_write(struct rw_semaphore *sem)
 {
 	rwsem_release(&sem->dep_map, _RET_IP_);
+#if defined(CONFIG_TRACEPOINTS) && defined(CONFIG_ANDROID_VENDOR_HOOKS)
 	trace_android_vh_rwsem_write_finished(sem);
+#endif
 	__up_write(sem);
 }
 EXPORT_SYMBOL(up_write);
@@ -1679,7 +1681,9 @@ EXPORT_SYMBOL(up_write);
 void downgrade_write(struct rw_semaphore *sem)
 {
 	lock_downgrade(&sem->dep_map, _RET_IP_);
+#if defined(CONFIG_TRACEPOINTS) && defined(CONFIG_ANDROID_VENDOR_HOOKS)
 	trace_android_vh_rwsem_write_finished(sem);
+#endif
 	__downgrade_write(sem);
 }
 EXPORT_SYMBOL(downgrade_write);
