@@ -42,6 +42,7 @@
 
 #include <linux/module.h>
 #include <linux/version.h>
+#include <linux/of.h>
 #include <linux/pci.h>
 #include <linux/netdevice.h>
 #include <linux/etherdevice.h>
@@ -25945,6 +25946,15 @@ rtl8168_setup_mqs_reg(struct rtl8168_private *tp)
         tp->imr_reg[3] = IntrMask3;
 }
 
+static void rtl8168_led_of_init(struct rtl8168_private *tp)
+{
+        struct device *d = tp_to_dev(tp);
+        u32 val;
+
+        if (!of_property_read_u32(d->of_node, "realtek,ledsel", &val))
+                RTL_W16(tp, CustomLED, val);
+}
+
 static void
 rtl8168_init_software_variable(struct net_device *dev)
 {
@@ -26640,6 +26650,7 @@ err1:
         if (tp->InitRxDescType == RX_DESC_RING_TYPE_2)
                 tp->RxDescLength = RX_DESC_LEN_TYPE_2;
 
+        rtl8168_led_of_init(tp);
         tp->NicCustLedValue = RTL_R16(tp, CustomLED);
 
         rtl8168_get_hw_wol(dev);
