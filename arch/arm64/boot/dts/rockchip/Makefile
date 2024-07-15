@@ -37,6 +37,9 @@ dtb-$(CONFIG_ARCH_ROCKCHIP) += \
 dtb-$(CONFIG_ARCH_ROCKCHIP) += \
 	rk3566-nanopi-r3-rev01.dtb
 
+dtb-$(CONFIG_ARCH_ROCKCHIP) += \
+	rk3528-nanopi-rev01.dtb
+
 else
 
 dtb-$(CONFIG_ARCH_ROCKCHIP) += px30-evb.dtb
