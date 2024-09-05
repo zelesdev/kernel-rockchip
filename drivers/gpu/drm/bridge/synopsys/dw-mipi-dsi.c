@@ -276,6 +276,7 @@ struct dw_mipi_dsi {
 	struct dw_mipi_dsi *slave; /* dual-dsi slave ptr */
 
 	const struct dw_mipi_dsi_plat_data *plat_data;
+	int c_status;
 };
 
 /*
@@ -1306,7 +1307,14 @@ dw_mipi_dsi_connector_detect(struct drm_connector *connector, bool force)
 	if (dsi->next_bridge && (dsi->next_bridge->ops & DRM_BRIDGE_OP_DETECT))
 		return drm_bridge_detect(dsi->next_bridge);
 
-	return connector_status_connected;
+	if (dsi->c_status == connector_status_unknown) {
+		if (drm_panel_prepare(dsi->panel) == -ENODEV)
+			dsi->c_status = connector_status_disconnected;
+		else
+			dsi->c_status = connector_status_connected;
+	}
+
+	return dsi->c_status;;
 }
 
 static void dw_mipi_dsi_drm_connector_destroy(struct drm_connector *connector)
@@ -1364,6 +1372,7 @@ int dw_mipi_dsi_bind(struct dw_mipi_dsi *dsi, struct drm_encoder *encoder)
 	int ret;
 
 	dsi->encoder = encoder;
+	dsi->c_status = connector_status_unknown;
 
 	ret = drm_bridge_attach(encoder, &dsi->bridge, NULL, 0);
 	if (ret) {
