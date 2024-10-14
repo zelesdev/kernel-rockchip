@@ -367,3 +367,5 @@ void mali_mem_unbind_dma_buf(mali_mem_backend *mem_backend)
 
 	_mali_osk_free(mem);
 }
+
+MODULE_IMPORT_NS(DMA_BUF);
