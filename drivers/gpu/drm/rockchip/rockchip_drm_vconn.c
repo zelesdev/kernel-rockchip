@@ -313,11 +313,8 @@ rockchip_virtual_connector_detect(struct drm_connector *connector, bool force)
 {
 	struct vconn_device *vconn_dev = to_vconn_device(connector);
 
-	if (vconn_dev->output_type == DRM_MODE_CONNECTOR_VIRTUAL)
-		return vconn_dev->connected ? connector_status_connected :
-					      connector_status_disconnected;
-
-	return connector_status_connected;
+	return vconn_dev->connected ? connector_status_connected :
+				      connector_status_disconnected;
 }
 
 static void rockchip_virtual_connector_destroy(struct drm_connector *connector)
@@ -428,7 +425,9 @@ static int rockchip_vconn_device_create(struct rockchip_vconn *vconn,
 					int bus_format,
 					int if_id)
 {
+	struct device_node *np = vconn->dev->of_node;
 	struct vconn_device *vconn_dev;
+	char propname[64];
 	int id;
 
 	id = rockchip_vconn_parse_vp_id(vconn, name);
@@ -437,6 +436,8 @@ static int rockchip_vconn_device_create(struct rockchip_vconn *vconn,
 		if (!vconn_dev)
 			return -ENOMEM;
 		vconn_dev->vconn = vconn;
+		snprintf(propname, sizeof(propname), "%s-disconnected", name);
+		vconn_dev->connected = !of_property_read_bool(np, propname);
 		vconn_dev->encoder_type = rockchip_vconn_get_encoder_type(conn_type);
 		vconn_dev->output_type = conn_type;
 		vconn_dev->output_mode = output_mode;
