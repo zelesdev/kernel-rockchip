@@ -136,6 +136,7 @@ static int rockchip_pm_virt_pwroff_prepare(struct sys_off_data *data)
 		}
 	}
 
+	pr_emerg("rockchip: virtual poweroff\n");
 	sip_smc_virtual_poweroff();
 
 	return NOTIFY_DONE;
